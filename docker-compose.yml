@@ -14,7 +14,12 @@ services:
       - nginx-vhost:/etc/nginx/vhost.d
       - /usr/share/nginx/html
     environment:
-      - DEFAULT_HOST=helpdesk.glocms.net
+      - DEFAULT_HOST=support.glocms.net
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   letsencrypt:
     image: jrcs/letsencrypt-nginx-proxy-companion
@@ -24,6 +29,11 @@ services:
       - nginx-certs:/etc/nginx/certs
     depends_on:
       - nginx-proxy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-railsserver:
     image: ghcr.io/zammad/zammad:6.4.0
@@ -43,6 +53,11 @@ services:
     depends_on:
       - zammad-postgresql
       - zammad-redis
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-nginx:
     image: ghcr.io/zammad/zammad:6.4.0
@@ -51,11 +66,16 @@ services:
     expose:
       - "8080"
     environment:
-      - VIRTUAL_HOST=helpdesk.glocms.net
-      - LETSENCRYPT_HOST=helpdesk.glocms.net
+      - VIRTUAL_HOST=support.glocms.net
+      - LETSENCRYPT_HOST=support.glocms.net
       - LETSENCRYPT_EMAIL=gavinvermaak83@gmail.com
     depends_on:
       - zammad-railsserver
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-postgresql:
     image: postgres:13
@@ -66,12 +86,22 @@ services:
       POSTGRES_DB: zammad_production
     volumes:
       - postgresql-data:/var/lib/postgresql/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-redis:
     image: redis:6
     restart: always
     volumes:
       - redis-data:/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.2
@@ -80,6 +110,11 @@ services:
       - discovery.type=single-node
     volumes:
       - elasticsearch-data:/usr/share/elasticsearch/data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-scheduler:
     image: ghcr.io/zammad/zammad:6.4.0
@@ -87,6 +122,11 @@ services:
     command: ["zammad-scheduler"]
     depends_on:
       - zammad-railsserver
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   zammad-websocket:
     image: ghcr.io/zammad/zammad:6.4.0
@@ -94,6 +134,11 @@ services:
     command: ["zammad-websocket"]
     depends_on:
       - zammad-railsserver
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
 
 volumes:
   zammad-storage:
